@@ -1,16 +1,62 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
-name: My workflow
+name: Test Workflow
 on:
   push:
     branches:
       - "**"
   workflow_dispatch:
+
 jobs:
   build:
     steps:
-      - name: Say hello
+      - name: Checkout code
+        uses: cloudbees-io/checkout@v1
+      
+      - name: Build application
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
-          echo "hello world"
+          echo "Building application..."
+          go version
+          echo "Build completed"
+
+  deploy-qa:
+    needs: build
+    environment: QA
+    steps:
+      - name: Deploy to QA
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+          echo "Deploying to QA environment"
+          echo "Environment: QA"
+          echo "URL: https://qa.myapp.com"
+      
+      - name: Run QA tests
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+          echo "Running tests in QA"
+          ./test.sh --env QA
+
+  deploy-prod:
+    needs: deploy-qa
+    environment: production
+    steps:
+      - name: Deploy to production
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+          echo "Deploying to production environment"
+          echo "Environment: production"
+          echo "URL: https://production.myapp.com"
+      
+      - name: Notify production deployment
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+          echo "Notifying production deployment"
+          curl -X POST https://webhook.site/test \
+            -d "env=production" \
+            -d "status=deployed"
