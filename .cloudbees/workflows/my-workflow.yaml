@@ -9,8 +9,8 @@ on:
 jobs:
   build:
     steps:
-      - name: Say hello
+      - name: Say hello sraybyee
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
-          echo "hello world"
+          echo "Say hello sraybyee"
