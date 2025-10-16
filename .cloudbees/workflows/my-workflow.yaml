@@ -1,6 +1,6 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
-name: My workflow
+name: Simple CloudBees Workflow Using Checkout Action
 on:
   push:
     branches:
@@ -9,8 +9,17 @@ on:
 jobs:
   build:
     steps:
-      - name: Hello from sraybyee
-        uses: docker://golang:1.20.3-alpine3.17
+      - id: checkout
+        name: Checkout repository
+        uses: cloudbees-io/checkout@v1
+        
+      - id: list-current-dir-contents-new
+        name: List repository contents
+        uses: docker://alpine:latest
         shell: sh
         run: |
-          echo "Hello from sraybyee"
+          echo "Repository contents:"
+          ls -la
+          echo ""
+          echo "Current working directory:"
+          pwd
