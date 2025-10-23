@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    timeout-minutes: 1
+    timeout-minutes: 2
     environment: approval_QA
     steps:
       - name: Say hello
