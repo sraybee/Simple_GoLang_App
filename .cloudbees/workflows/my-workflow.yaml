@@ -1,17 +1,52 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
-name: My workflow
-
+name: A Simple Staged Workflow
 on:
   workflow_dispatch:
-
+    inputs:
+      manifest:
+        type: string
+        required: true
+        description: A sample manifest should go here, to help user
+metadata:
+  stages/v1alpha1:
+    - name: Stage
+      jobs:
+        - job
+    - name: Stage2
+      jobs:
+        - job2
+    - name: Stage1
+      jobs:
+        - job1
 jobs:
   build:
-    timeout-minutes: 2
-    environment: approval_QA
     steps:
       - name: Say hello
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
           echo "hello world"
+    needs: []
+  job:
+    steps:
+      - run: echo "hello world"
+        uses: docker://golang:1.20.3-alpine3.17
+        name: Say hello
+        shell: sh
+  job1:
+    needs:
+      - job2
+    steps:
+      - name: Say hello
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: echo "hello world"
+  job2:
+    needs:
+      - job
+    steps:
+      - name: Say hello
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: echo "hello world"
